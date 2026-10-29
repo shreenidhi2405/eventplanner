@@ -1,0 +1,9 @@
+{
+  "name": "celebrati-ai",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Celebráti AI - GenAI Celebration & Event Planner",
+  "scripts": {
+    "start": "python -m http.server 8080"
+  }
+}
