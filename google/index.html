@@ -70,6 +70,10 @@
           </svg>
         </button>
 
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px; margin-left:0.25rem;">
+          <button id="btnAuth" class="btn-pill btn-secondary" type="button">Sign in</button>
+          <small id="authStatusLabel" style="font-size:0.68rem; color:var(--text-muted);">Local demo mode</small>
+        </div>
         <button id="btnThemeToggle" class="btn-icon" title="Toggle Dark/Light Mode">
           <svg id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -988,6 +992,24 @@
         <button class="btn-pill btn-secondary modal-close-trigger">Cancel</button>
         <button id="btnSaveGeminiKey" class="btn-pill btn-primary">Save Settings</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Supabase account access -->
+  <div id="authModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="font-size:1.2rem; color:var(--text-primary);">Your Celebráti Account</h3>
+        <button class="btn-icon modal-close-trigger" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.88rem; color:var(--text-secondary); line-height:1.5; margin-bottom:1rem;">Sign in to connect your account. Your event data will be protected by Supabase Row Level Security.</p>
+        <div class="form-group"><label class="form-label" for="authFullName">Full name (for new accounts)</label><input id="authFullName" type="text" class="form-input" autocomplete="name" placeholder="Your name"></div>
+        <div class="form-group"><label class="form-label" for="authEmail">Email address</label><input id="authEmail" type="email" class="form-input" autocomplete="email" placeholder="you@example.com"></div>
+        <div class="form-group"><label class="form-label" for="authPassword">Password</label><input id="authPassword" type="password" class="form-input" autocomplete="current-password" placeholder="At least 6 characters"></div>
+        <p id="authFeedback" role="status" style="font-size:0.8rem; color:var(--text-secondary); min-height:1.2rem;"></p>
+      </div>
+      <div class="modal-footer" style="gap:0.5rem; flex-wrap:wrap;"><button id="btnAuthSignIn" class="btn-pill btn-primary">Sign in</button><button id="btnAuthSignUp" class="btn-pill btn-secondary">Create account</button></div>
     </div>
   </div>
 
