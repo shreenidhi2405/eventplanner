@@ -607,23 +607,14 @@ class App {
       btnSaveNewEvent.onclick = () => this.saveNewEventFromModal();
     }
 
-    // Gemini API Key Modal
+    // Gemini runs through the authenticated Supabase Edge Function.
+    // API keys are configured by the project administrator in Supabase secrets.
     const btnOpenKeyModal = document.getElementById('btnOpenKeyModal');
     if (btnOpenKeyModal) {
-      btnOpenKeyModal.onclick = () => {
-        document.getElementById('geminiApiKeyInput').value = AIEngine.getApiKey();
-        this.openModal('geminiKeyModal');
-      };
-    }
-
-    const btnSaveKey = document.getElementById('btnSaveGeminiKey');
-    if (btnSaveKey) {
-      btnSaveKey.onclick = () => {
-        const val = document.getElementById('geminiApiKeyInput').value;
-        AIEngine.setApiKey(val);
-        this.closeModal('geminiKeyModal');
-        this.showToast(val ? 'Gemini API Key activated!' : 'Gemini Key cleared (Using Native Engine)', 'success');
-      };
+      btnOpenKeyModal.onclick = () => this.showToast(
+        'Gemini is securely configured by the project administrator in Supabase.',
+        'info'
+      );
     }
   }
 
