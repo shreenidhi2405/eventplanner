@@ -12,7 +12,8 @@ export class AIEngine {
   static async generatePlanningResponse(promptText, activeEvent, onChunk = null) {
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (!sessionError && session?.access_token) {
+      if (sessionError) throw sessionError;
+      if (session?.access_token) {
         const { data, error } = await supabase.functions.invoke('event-ai', {
           body: {
             prompt: promptText,
@@ -35,7 +36,8 @@ export class AIEngine {
         }
       }
     } catch (err) {
-      console.warn('Secure Gemini service unavailable; using built-in event assistant.', err);
+      console.error('EventPlanner AI service failed:', err);
+      throw new Error('EventPlanner AI could not reach Gemini. Please check your connection and sign-in, then try again.');
     }
     return await this.generateNativeResponse(promptText, activeEvent, onChunk);
   }
