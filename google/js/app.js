@@ -10,6 +10,7 @@ import { TimelineManager } from './timeline.js';
 import { VendorManager } from './vendors.js';
 import { MoodboardManager } from './moodboard.js';
 import { GuestManager } from './guests.js';
+import { AuthManager } from './auth.js';
 
 class App {
   constructor() {
@@ -19,6 +20,7 @@ class App {
     this.vendorManager = new VendorManager(this);
     this.moodboardManager = new MoodboardManager(this);
     this.guestManager = new GuestManager(this);
+    this.authManager = new AuthManager(this);
 
     this.init();
   }
@@ -31,6 +33,7 @@ class App {
     this.initModals();
     this.initAIChat();
     this.initGlobalActions();
+    this.initAuth();
 
     // Render active tab sub-managers
     this.renderCurrentView();
@@ -620,6 +623,42 @@ class App {
         this.showToast(val ? 'Gemini API Key activated!' : 'Gemini Key cleared (Using Native Engine)', 'success');
       };
     }
+  }
+
+  initAuth() {
+    this.authManager.init();
+    document.getElementById('btnAuth')?.addEventListener('click', async () => {
+      if (this.authManager.user) {
+        try { await this.authManager.signOut(); this.showToast('Signed out. Local demo data remains on this device.', 'info'); }
+        catch (error) { this.showToast(error.message || 'Unable to sign out.', 'warning'); }
+      } else {
+        document.getElementById('authFeedback').textContent = '';
+        this.openModal('authModal');
+      }
+    });
+
+    document.getElementById('btnAuthSignIn')?.addEventListener('click', async () => {
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      const feedback = document.getElementById('authFeedback');
+      feedback.textContent = 'Signing in…';
+      try { await this.authManager.signIn(email, password); this.closeModal('authModal'); this.showToast('Signed in successfully.', 'success'); }
+      catch (error) { feedback.textContent = error.message || 'Sign-in failed.'; }
+    });
+
+    document.getElementById('btnAuthSignUp')?.addEventListener('click', async () => {
+      const fullName = document.getElementById('authFullName').value.trim();
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      const feedback = document.getElementById('authFeedback');
+      if (password.length < 6) { feedback.textContent = 'Use a password with at least 6 characters.'; return; }
+      feedback.textContent = 'Creating your account…';
+      try {
+        const result = await this.authManager.signUp(email, password, fullName);
+        feedback.textContent = result.session ? 'Account created and signed in.' : 'Account created. Check your email to confirm, then sign in.';
+        if (result.session) { this.closeModal('authModal'); this.showToast('Account created successfully.', 'success'); }
+      } catch (error) { feedback.textContent = error.message || 'Account creation failed.'; }
+    });
   }
 
   openModal(modalId) {
