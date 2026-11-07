@@ -11,6 +11,7 @@ import { VendorManager } from './vendors.js';
 import { MoodboardManager } from './moodboard.js';
 import { GuestManager } from './guests.js';
 import { AuthManager } from './auth.js';
+import { CloudSyncManager } from './cloud-sync.js';
 
 class App {
   constructor() {
@@ -34,6 +35,7 @@ class App {
     this.initAIChat();
     this.initGlobalActions();
     this.initAuth();
+    this.initCloudSync();
 
     // Render active tab sub-managers
     this.renderCurrentView();
@@ -623,6 +625,35 @@ class App {
         this.showToast(val ? 'Gemini API Key activated!' : 'Gemini Key cleared (Using Native Engine)', 'success');
       };
     }
+  }
+
+  initCloudSync() {
+    const button = document.getElementById('btnCloudSync');
+    if (!button) return;
+    const update = () => {
+      button.disabled = !this.authManager.user;
+      button.title = this.authManager.user ? 'Save the active event and its planning data to your Supabase account' : 'Sign in to enable cloud save';
+    };
+    update();
+    document.getElementById('btnAuth')?.addEventListener('click', () => setTimeout(update, 0));
+    button.addEventListener('click', async () => {
+      if (!this.authManager.user) { this.openModal('authModal'); return; }
+      button.disabled = true;
+      const original = button.textContent;
+      button.textContent = 'Saving…';
+      try {
+        const active = EventStorageManager.getActiveEvent();
+        const saved = await CloudSyncManager.saveEvent(active, this.authManager.user);
+        EventStorageManager.updateActiveEvent(saved);
+        this.showToast('Active event and planning data saved to your cloud account.', 'success');
+      } catch (error) {
+        console.error('Cloud save failed:', error);
+        this.showToast(error.message || 'Cloud save failed. Check your connection and database permissions.', 'warning');
+      } finally {
+        button.textContent = original;
+        update();
+      }
+    });
   }
 
   initAuth() {
