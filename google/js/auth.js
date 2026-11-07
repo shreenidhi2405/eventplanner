@@ -8,9 +8,11 @@ export class AuthManager {
     if (error) console.error('Unable to restore Supabase session:', error);
     this.user = data?.session?.user || null;
     this.render();
+    if (this.user) this.app.onAuthStateChanged(this.user);
     supabase.auth.onAuthStateChange((_event, session) => {
       this.user = session?.user || null;
       this.render();
+      this.app.onAuthStateChanged(this.user);
     });
   }
 
