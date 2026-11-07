@@ -11,7 +11,7 @@ export class CloudSyncManager {
   static async loadEvents(user) {
     if (!user?.id) return [];
     const { data: rows, error } = await supabase.from('events')
-      .select('id, event_name, event_type, description, event_date, location, guest_count, status, budgets(total_budget, currency), expenses(category, description, amount, expense_date), tasks(task_name, description, due_date, priority, is_completed), guests(guest_name, email, phone, rsvp_status, plus_ones), schedules(activity_name, start_time, end_time, location, notes)')
+      .select('id, event_name, event_type, description, event_date, location, guest_count, status, budgets(total_budget, currency), expenses(category, description, amount, expense_date), tasks(task_name, description, due_date, priority, is_completed), guests(guest_name, email, phone, rsvp_status, plus_ones), schedules(activity_name, start_time, end_time, location, notes), event_vendors(vendor_name, vendor_type, contact_name, phone, email, quote, deposit_paid, booking_status, checklist, notes)')
       .eq('user_id', user.id).order('created_at', { ascending: false });
     if (error) throw error;
     return (rows || []).map(row => {
@@ -51,6 +51,13 @@ export class CloudSyncManager {
           notes: details.slice(1).join(' | '), completed: false
         };
       });
+      const vendors = (row.event_vendors || []).map((vendor, index) => ({
+        id: 'cloud-vendor-' + index, name: vendor.vendor_name, category: vendor.vendor_type || 'Other',
+        contact: vendor.contact_name || '', phone: vendor.phone || '', email: vendor.email || '',
+        quote: Number(vendor.quote) || 0, depositPaid: Number(vendor.deposit_paid) || 0,
+        status: vendor.booking_status || 'shortlisted',
+        checklist: Array.isArray(vendor.checklist) ? vendor.checklist : [], notes: vendor.notes || ''
+      }));
       const type = row.event_type || 'celebration';
       return {
         id: 'cloud_' + row.id, cloudId: row.id, title: row.event_name, type,
@@ -59,7 +66,7 @@ export class CloudSyncManager {
         guestCount: Number(row.guest_count) || 0,
         heroImage: type === 'birthday' ? 'assets/images/birthday.jpg' : type === 'community' ? 'assets/images/community.jpg' : 'assets/images/wedding.jpg',
         themeName: row.event_name + ' Aesthetic', themeVibe: row.description || '', palette: [],
-        budget, timeline, runOfShow, vendors: [], guests,
+        budget, timeline, runOfShow, vendors, guests,
         personalizedIdeas: { signatureDrinks: [], playlistVibes: '', invitationStyles: { romantic: '', modern: '', poetic: '' } }
       };
     });
@@ -94,7 +101,7 @@ export class CloudSyncManager {
     if (budgetError) throw budgetError;
 
     // Replace this event's child records as one logical snapshot.
-    for (const table of ['expenses', 'tasks', 'guests', 'schedules']) {
+    for (const table of ['expenses', 'tasks', 'guests', 'schedules', 'event_vendors']) {
       const { error } = await supabase.from(table).delete().eq('event_id', eventId);
       if (error) throw error;
     }
@@ -133,6 +140,24 @@ export class CloudSyncManager {
     }));
     if (guests.length) {
       const { error } = await supabase.from('guests').insert(guests);
+      if (error) throw error;
+    }
+
+    const vendors = (event.vendors || []).map(item => ({
+      event_id: eventId,
+      vendor_name: item.name || 'Vendor',
+      vendor_type: item.category || 'Other',
+      contact_name: item.contact || null,
+      phone: item.phone || null,
+      email: item.email || null,
+      quote: Number(item.quote) || 0,
+      deposit_paid: Number(item.depositPaid) || 0,
+      booking_status: item.status || 'shortlisted',
+      checklist: Array.isArray(item.checklist) ? item.checklist : [],
+      notes: item.notes || null
+    }));
+    if (vendors.length) {
+      const { error } = await supabase.from('event_vendors').insert(vendors);
       if (error) throw error;
     }
 
