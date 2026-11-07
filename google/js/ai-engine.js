@@ -46,7 +46,7 @@ export class AIEngine {
   static async generateNativeResponse(prompt, activeEvent, onChunk) {
     const p = prompt.toLowerCase();
     const evType = activeEvent.type;
-    const currency = activeEvent.currency || '$';
+    const currency = activeEvent.currency || '₹';
     const budget = activeEvent.targetBudget || 10000;
     const guests = activeEvent.guestCount || 50;
 
@@ -134,7 +134,7 @@ Here are curated aesthetic visions engineered specifically for your **${event.gu
 * **The Atmosphere:** Moody luxury with midnight navy drapes, floating glass orbs with tea lights, constellation place cards, and champagne velvet table linens.
 * **Color Palette:** Midnight Indigo (\`#1E1B4B\`), Starlight Gold (\`#EAB308\`), Silver Dust (\`#E2E8F0\`).
 
-💡 *Tip from Aura: Selecting 2 primary anchor colors and 2 subtle neutrals creates maximum visual cohesion without feeling overly matchy.*`;
+💡 *Tip from EventPlanner: Selecting 2 primary anchor colors and 2 subtle neutrals creates maximum visual cohesion without feeling overly matchy.*`;
     } else if (event.type === 'birthday') {
       return `### 🍸 3 High-Energy Concepts for ${event.title}
 
@@ -157,7 +157,7 @@ Curated concepts tailored for **${event.guestCount} guests** celebrating this mo
 #### 3. Havana Nights Speakeasy
 * **The Atmosphere:** Cuban rum tasting bar, lush tropical monstera and palm leaves, brass ceiling fans, cigar rolling station, and acoustic bossa-nova rhythms.
 
-💡 *Tip from Aura: Prioritize concentrated lighting zones over uniform lighting to make small spaces feel like an exclusive VIP lounge.*`;
+💡 *Tip from EventPlanner: Prioritize concentrated lighting zones over uniform lighting to make small spaces feel like an exclusive VIP lounge.*`;
     } else {
       return `### 🎪 3 Inspiring Themes for ${event.title}
 
@@ -186,7 +186,7 @@ Designed for community engagement, warm togetherness, and memorable shared momen
    * 2. Smart Budget Allocator
    */
   static getSmartBudgetBreakdown(event) {
-    const cur = event.currency || '$';
+    const cur = event.currency || '₹';
     const total = event.targetBudget || 10000;
     const guests = event.guestCount || 80;
 
@@ -230,7 +230,7 @@ Designed for community engagement, warm togetherness, and memorable shared momen
 * **Guest Count:** \`${guests} guests\`
 * **Effective Spend Per Guest:** \`${cur}${costPerGuest}\`
 
-| Expense Category | Allocation % | Estimated Budget | Aura Optimization Advice |
+| Expense Category | Allocation % | Estimated Budget | EventPlanner Optimization Advice |
 | :--- | :--- | :--- | :--- |
 | **Venue & Permits** | ${(venuePct * 100).toFixed(0)}% | **${cur}${items[0].estimated.toLocaleString()}** | Ensure load-in/out hours are included to prevent overtime fees. |
 | **Food & Beverage** | ${(cateringPct * 100).toFixed(0)}% | **${cur}${items[1].estimated.toLocaleString()}** | Family-style or stations often save 15-20% compared to plated coursing. |
@@ -239,7 +239,7 @@ Designed for community engagement, warm togetherness, and memorable shared momen
 | **Entertainment & Sound** | ${(musicPct * 100).toFixed(0)}% | **${cur}${items[4].estimated.toLocaleString()}** | Bundle MC hosting with sound engineer to eliminate duplicate equipment fees. |
 | **Emergency Buffer** | ${(bufferPct * 100).toFixed(0)}% | **${cur}${items[5].estimated.toLocaleString()}** | Mandatory buffer for weather adaptations, tips, and rush deliveries. |
 
-#### 💡 Aura's 3 Secret Cost-Saving Recommendations:
+#### 💡 EventPlanner's 3 Secret Cost-Saving Recommendations:
 1. **Curated Bar Strategy:** Instead of an unrestricted full bar, offer high-quality wine, craft beer, and 2 signature cocktails. This trims beverage overhead by up to **28%**.
 2. **Seasonal Botanical Sourcing:** Ask your florist to substitute imported blooms with local seasonal stems of equivalent texture (e.g. garden spray roses and ranunculus instead of rare peonies).
 3. **Digital Stationery with Printed Keepsakes:** Use digital RSVP collection with QR codes, printing only physical keepsake invitations for VIP family members.`;
@@ -281,7 +281,7 @@ Here is a seamless, low-stress day-of timeline structured to ensure zero awkward
 * **08:00 PM — First Dance & Party Launch:** Cake cutting immediately into the couple's first dance, opening the dance floor!
 * **10:30 PM — Sparkler Farewell:** Grand exit through twin rows of sparklers.
 
-💡 *Aura Coordinator Tip: Always add 10-15 minute buffer cushions before the ceremony and before the grand entrance. Guests always take longer to find their seats than anticipated!*`;
+💡 *EventPlanner Coordinator Tip: Always add 10-15 minute buffer cushions before the ceremony and before the grand entrance. Guests always take longer to find their seats than anticipated!*`;
     } else if (event.type === 'birthday') {
       items = [
         { time: '05:30 PM', title: 'Sound, Neon & Bartender Setup', location: 'Rooftop Bar', notes: 'Check neon photo wall lighting & chill champagne' },
@@ -358,7 +358,7 @@ Before signing contracts or wiring non-refundable deposits, review these essenti
   * *"Do you bring backup sound mixers and wireless microphones for toasts and speeches?"*
   * *"How do you handle guest song requests vs our strictly enforced 'Do Not Play' list?"*
 
-💡 *Aura Pro Tip: Always ensure payments are split into at least 3 milestones (Deposit, Mid-point Check-in, and Final balance 7-14 days before the event). Never pay 100% upfront.*`;
+💡 *EventPlanner Pro Tip: Always ensure payments are split into at least 3 milestones (Deposit, Mid-point Check-in, and Final balance 7-14 days before the event). Never pay 100% upfront.*`;
   }
 
   /**
@@ -451,7 +451,7 @@ Skip generic trinkets that get left behind. Here are high-perceived-value, thoug
    * 8. General Consulting
    */
   static getGeneralConsulting(prompt, event) {
-    return `### 💡 Aura Event Consulting
+    return `### 💡 EventPlanner Event Consulting
 
 Thank you for your question regarding **${event.title}**.
 
