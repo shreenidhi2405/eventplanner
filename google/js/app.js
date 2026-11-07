@@ -656,6 +656,29 @@ class App {
     });
   }
 
+  async onAuthStateChanged(user) {
+    const cloudButton = document.getElementById('btnCloudSync');
+    if (cloudButton) cloudButton.disabled = !user;
+    if (!user) return;
+    try {
+      const cloudEvents = await CloudSyncManager.loadEvents(user);
+      if (!cloudEvents.length) {
+        this.showToast('Signed in. Save an event to start your cloud planner.', 'info');
+        return;
+      }
+      const localOnly = EventStorageManager.getEvents().filter(event => !event.cloudId);
+      EventStorageManager.saveEvents([...cloudEvents, ...localOnly]);
+      EventStorageManager.setActiveEventId(cloudEvents[0].id);
+      this.populateEventSelector();
+      this.updateActiveEventUI();
+      this.renderCurrentView();
+      this.showToast('Your cloud events have been restored on this device.', 'success');
+    } catch (error) {
+      console.error('Cloud restore failed:', error);
+      this.showToast(error.message || 'Could not restore cloud events.', 'warning');
+    }
+  }
+
   initAuth() {
     this.authManager.init();
     document.getElementById('btnAuth')?.addEventListener('click', async () => {
