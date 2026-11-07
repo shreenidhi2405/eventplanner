@@ -716,7 +716,16 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Target Budget ($)</label>
+            <label class="form-label">Currency</label>
+            <select id="newEventCurrency" class="form-select">
+              <option value="₹" selected>INR (₹)</option>
+              <option value="$">USD ($)</option>
+              <option value="€">EUR (€)</option>
+              <option value="£">GBP (£)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Target Budget (<span id="newEventCurrencyLabel">₹</span>)</label>
             <input id="newEventBudget" type="number" class="form-input" value="15000">
           </div>
           <div class="form-group">
