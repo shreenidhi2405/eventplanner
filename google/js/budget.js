@@ -26,7 +26,7 @@ export class BudgetManager {
   }
 
   renderStats(event) {
-    const cur = event.currency || '$';
+    const cur = event.currency || '₹';
     const target = Number(event.targetBudget) || 0;
     const items = event.budget || [];
 
@@ -140,7 +140,7 @@ export class BudgetManager {
               <span style="width: 10px; height: 10px; border-radius: 50%; background: ${b.color};"></span>
               <span style="color: var(--text-secondary);">${b.category}</span>
             </div>
-            <span style="font-weight: 600; color: var(--text-primary);">${event.currency || '$'}${b.amount.toLocaleString()} (${pct}%)</span>
+            <span style="font-weight: 600; color: var(--text-primary);">${event.currency || '₹'}${b.amount.toLocaleString()} (${pct}%)</span>
           </div>
         `;
       }).join('');
@@ -151,7 +151,7 @@ export class BudgetManager {
     const tbody = document.getElementById('budgetTableBody');
     if (!tbody) return;
 
-    const cur = event.currency || '$';
+    const cur = event.currency || '₹';
     let items = event.budget || [];
 
     if (this.currentFilter !== 'all') {
