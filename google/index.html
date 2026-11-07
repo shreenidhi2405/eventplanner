@@ -65,12 +65,6 @@
           </svg>
         </button>
 
-        <button id="btnOpenKeyModal" class="btn-icon" title="AI Studio / Gemini API Settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm1-5.5a2 2 0 0 0-2-2h-1v-2h2a4 4 0 0 1 4 4c0 1.48-.81 2.77-2 3.46V13h-2v-1.04c1.19-.37 2-1.49 2-2.96z"></path>
-          </svg>
-        </button>
-
         <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px; margin-left:0.25rem;">
           <button id="btnAuth" class="btn-pill btn-secondary" type="button">Sign in</button>
           <small id="authStatusLabel" style="font-size:0.68rem; color:var(--text-muted);">Local demo mode</small>
@@ -966,32 +960,6 @@
       <div class="modal-footer">
         <button class="btn-pill btn-secondary modal-close-trigger">Cancel</button>
         <button id="btnSaveGuestModal" class="btn-pill btn-primary">Save Guest</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 6: Gemini API Key Configuration -->
-  <div id="geminiKeyModal" class="modal-overlay">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 style="font-size: 1.2rem; color: var(--text-primary);">Gemini AI Studio Configuration</h3>
-        <button class="btn-icon modal-close-trigger" aria-label="Close modal">✕</button>
-      </div>
-      <div class="modal-body">
-        <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">
-          Celebráti AI includes a built-in high precision event knowledge engine. You may optionally enter your <strong>Google Gemini API key</strong> below to enable direct live cloud streaming.
-        </p>
-        <div class="form-group" style="margin-top: 1rem;">
-          <label class="form-label">Google AI Studio API Key</label>
-          <input id="geminiApiKeyInput" type="password" class="form-input" placeholder="AIzaSy...">
-          <small style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
-            Stored safely only in your browser's local storage. Leave empty to use the built-in intelligent engine.
-          </small>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-pill btn-secondary modal-close-trigger">Cancel</button>
-        <button id="btnSaveGeminiKey" class="btn-pill btn-primary">Save Settings</button>
       </div>
     </div>
   </div>
