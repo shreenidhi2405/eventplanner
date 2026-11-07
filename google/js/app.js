@@ -32,6 +32,11 @@ class App {
     this.updateActiveEventUI();
     this.initTabNavigation();
     this.initModals();
+    const currencySelect = document.getElementById('newEventCurrency');
+    const currencyLabel = document.getElementById('newEventCurrencyLabel');
+    currencySelect?.addEventListener('change', () => {
+      if (currencyLabel) currencyLabel.textContent = currencySelect.value;
+    });
     this.initAIChat();
     this.initGlobalActions();
     this.initAuth();
@@ -717,15 +722,7 @@ class App {
   }
 
   saveNewEventFromModal() {
-    const currencySelect = document.getElementById('newEventCurrency');
-    const currencyLabel = document.getElementById('newEventCurrencyLabel');
-    if (currencySelect && !currencySelect.dataset.labelBound) {
-      currencySelect.addEventListener('change', () => {
-        if (currencyLabel) currencyLabel.textContent = currencySelect.value;
-      });
-      currencySelect.dataset.labelBound = 'true';
-    }
-    const title = document.getElementById('newEventTitle').value.trim();
+        const title = document.getElementById('newEventTitle').value.trim();
     const type = document.getElementById('newEventType').value;
     const date = document.getElementById('newEventDate').value;
     const budget = Number(document.getElementById('newEventBudget').value) || 5000;
