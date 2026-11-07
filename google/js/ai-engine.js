@@ -1,91 +1,40 @@
 /**
  * Celebráti AI - Generative AI Planning Engine
- * Dual-Mode Engine:
- * 1. Native High-Precision Knowledge Generator (Rich, context-aware, instant & zero-latency)
- * 2. Optional Google Gemini API Integration (Bring-your-own API key in settings)
+ * Gemini requests are proxied through an authenticated Supabase Edge Function.
+ * No Gemini API key is stored in browser storage or sent by the client.
  */
-
-const GEMINI_STORAGE_KEY = 'celebrati_gemini_api_key';
+import { supabase } from './supabase-client.js';
 
 export class AIEngine {
-  static getApiKey() {
-    return localStorage.getItem(GEMINI_STORAGE_KEY) || '';
-  }
-
-  static setApiKey(key) {
-    localStorage.setItem(GEMINI_STORAGE_KEY, key.trim());
-  }
-
-  /**
-   * Main query processor that handles both custom prompts and prompt chips
-   */
   static async generatePlanningResponse(promptText, activeEvent, onChunk = null) {
-    const apiKey = this.getApiKey();
-
-    if (apiKey && apiKey.length > 10) {
-      try {
-        return await this.callGeminiAPI(promptText, activeEvent, apiKey, onChunk);
-      } catch (err) {
-        console.warn('Gemini API call failed, falling back to Native Intelligence Engine:', err);
-      }
-    }
-
-    // Native High-Precision Knowledge Generator
-    return await this.generateNativeResponse(promptText, activeEvent, onChunk);
-  }
-
-  /**
-   * Call official Gemini API
-   */
-  static async callGeminiAPI(prompt, activeEvent, apiKey, onChunk) {
-    const systemPrompt = `You are Aura, an elite luxury celebration and event planning AI assistant.
-Active Event Context:
-- Title: ${activeEvent.title}
-- Type: ${activeEvent.type}
-- Target Budget: ${activeEvent.currency}${activeEvent.targetBudget}
-- Guest Count: ${activeEvent.guestCount}
-- Location: ${activeEvent.location}
-- Date: ${activeEvent.date}
-- Vibe: ${activeEvent.themeVibe}
-
-Provide rich, highly organized, inspiring, and actionable advice. Use markdown headings, bullet points, and tables where suitable. Include actionable tips on budget, timelines, vendors, decor, or copy.`;
-
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          { role: 'user', parts: [{ text: `${systemPrompt}\n\nUser Question/Request:\n${prompt}` }] }
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1200
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (!sessionError && session?.access_token) {
+        const { data, error } = await supabase.functions.invoke('event-ai', {
+          body: {
+            prompt: promptText,
+            event: {
+              title: activeEvent?.title,
+              type: activeEvent?.type,
+              currency: activeEvent?.currency,
+              targetBudget: activeEvent?.targetBudget,
+              guestCount: activeEvent?.guestCount,
+              location: activeEvent?.location,
+              date: activeEvent?.date,
+              themeVibe: activeEvent?.themeVibe
+            }
+          }
+        });
+        if (error) throw error;
+        if (data?.text) {
+          if (onChunk) await this.simulateStream(data.text, onChunk);
+          return { text: data.text, actionableData: this.detectActionableData(data.text, activeEvent) };
         }
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Gemini API returned status ${response.status}: ${errorText}`);
+      }
+    } catch (err) {
+      console.warn('Secure Gemini service unavailable; using built-in event assistant.', err);
     }
-
-    const data = await response.json();
-    const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!candidate) {
-      throw new Error('No candidate content received from Gemini API');
-    }
-
-    if (onChunk) {
-      // Simulate smooth typewriter for Gemini output
-      await this.simulateStream(candidate, onChunk);
-    }
-
-    return {
-      text: candidate,
-      actionableData: this.detectActionableData(candidate, activeEvent)
-    };
+    return await this.generateNativeResponse(promptText, activeEvent, onChunk);
   }
 
   /**
