@@ -5,6 +5,9 @@
  */
 import { supabase } from './supabase-client.js';
 
+// Remove legacy browser-stored Gemini credentials from earlier versions.
+try { localStorage.removeItem('celebrati_gemini_api_key'); } catch { /* storage may be unavailable */ }
+
 export class AIEngine {
   static async generatePlanningResponse(promptText, activeEvent, onChunk = null) {
     try {
