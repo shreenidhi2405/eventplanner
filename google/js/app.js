@@ -742,7 +742,7 @@ class App {
       date: date ? `${date}T18:00` : new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 16),
       location,
       targetBudget: budget,
-      currency: '$',
+      currency: document.getElementById('newEventCurrency')?.value || '₹',
       guestCount: guests,
       heroImage,
       themeName: `${title} Aesthetic`,
