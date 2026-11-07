@@ -7,6 +7,64 @@ const asDate = value => {
 };
 
 export class CloudSyncManager {
+
+  static async loadEvents(user) {
+    if (!user?.id) return [];
+    const { data: rows, error } = await supabase.from('events')
+      .select('id, event_name, event_type, description, event_date, location, guest_count, status, budgets(total_budget, currency), expenses(category, description, amount, expense_date), tasks(task_name, description, due_date, priority, is_completed), guests(guest_name, email, phone, rsvp_status, plus_ones), schedules(activity_name, start_time, end_time, location, notes)')
+      .eq('user_id', user.id).order('created_at', { ascending: false });
+    if (error) throw error;
+    return (rows || []).map(row => {
+      const budgetRow = (row.budgets || [])[0] || {};
+      const budget = (row.expenses || []).map((item, index) => {
+        const parts = (item.description || '').split(' | ');
+        const estimated = parts.find(part => part.startsWith('Estimated: '));
+        const status = parts.find(part => part.startsWith('Status: '));
+        const notes = parts.find(part => part.startsWith('Notes: '));
+        return {
+          id: 'cloud-expense-' + index, name: parts[0] || item.category || 'Expense',
+          category: item.category || 'Other',
+          estimated: estimated ? Number(estimated.slice(11)) || 0 : Number(item.amount) || 0,
+          actual: Number(item.amount) || 0, status: status ? status.slice(8) : 'pending',
+          notes: notes ? notes.slice(7) : ''
+        };
+      });
+      const timeline = (row.tasks || []).map((task, index) => {
+        const details = (task.description || '').split(' | ');
+        return {
+          id: 'cloud-task-' + index, title: task.task_name, phase: details[0] || 'Planning Phase',
+          date: task.due_date || 'TBD', completed: Boolean(task.is_completed),
+          priority: task.priority || 'medium',
+          assignee: (details.find(part => part.startsWith('Assigned to: ')) || '').replace('Assigned to: ', '')
+        };
+      });
+      const guests = (row.guests || []).map((guest, index) => ({
+        id: 'cloud-guest-' + index, name: guest.guest_name, email: guest.email || '',
+        phone: guest.phone || '', rsvp: guest.rsvp_status || 'pending',
+        count: 1 + (Number(guest.plus_ones) || 0), dietary: '', table: ''
+      }));
+      const runOfShow = (row.schedules || []).map((item, index) => {
+        const details = (item.notes || '').split(' | ');
+        return {
+          id: 'cloud-schedule-' + index, time: details[0] || '',
+          title: item.activity_name, location: item.location || '',
+          notes: details.slice(1).join(' | '), completed: false
+        };
+      });
+      const type = row.event_type || 'celebration';
+      return {
+        id: 'cloud_' + row.id, cloudId: row.id, title: row.event_name, type,
+        date: row.event_date ? row.event_date + 'T18:00' : '', location: row.location || 'TBD',
+        targetBudget: Number(budgetRow.total_budget) || 0, currency: budgetRow.currency || 'INR',
+        guestCount: Number(row.guest_count) || 0,
+        heroImage: type === 'birthday' ? 'assets/images/birthday.jpg' : type === 'community' ? 'assets/images/community.jpg' : 'assets/images/wedding.jpg',
+        themeName: row.event_name + ' Aesthetic', themeVibe: row.description || '', palette: [],
+        budget, timeline, runOfShow, vendors: [], guests,
+        personalizedIdeas: { signatureDrinks: [], playlistVibes: '', invitationStyles: { romantic: '', modern: '', poetic: '' } }
+      };
+    });
+  }
+
   static async saveEvent(event, user) {
     if (!user?.id) throw new Error('Sign in before saving to cloud.');
 
