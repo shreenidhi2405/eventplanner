@@ -134,7 +134,7 @@ class App {
 
     if (heroMetaLocation) heroMetaLocation.textContent = event.location || 'Location TBD';
     if (heroMetaGuests) heroMetaGuests.textContent = `${event.guestCount || 0} Guests`;
-    if (heroMetaBudget) heroMetaBudget.textContent = `${event.currency || '$'}${(Number(event.targetBudget) || 0).toLocaleString()}`;
+    if (heroMetaBudget) heroMetaBudget.textContent = `${event.currency || '₹'}${(Number(event.targetBudget) || 0).toLocaleString()}`;
 
     // Update Countdown
     this.timelineManager.initCountdown();
